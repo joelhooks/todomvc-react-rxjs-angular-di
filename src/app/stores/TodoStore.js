@@ -19,12 +19,39 @@ class TodoStore {
       console.log("OPERATION")
       return operation(todoList);
     })
-
-    // each updated note array is stored in local storage
-    this.todoList.subscribe((update) => {
-      console.log('SAVE', update)
-      LocalStorage.save(key, update)
+    .flatMapLatest((todoList) => {
+      console.log('SAVE', todoList);
+      
+      // "wrap" the local storage call in an Observable. this Observable
+      // will be subscribed to, synchronously execute the save, and
+      // synchronously complete.
+      // 
+      // Run this in parallel with the Observable that does the async
+      // network request. ForkJoin waits for them both to complete,
+      // then onNext's an Array of each of their final values, then
+      // completes.
+      // 
+      // Map the result back into the original todoList value for future
+      // subscribers.
+      return Rx.Observable.forkJoin([
+          Rx.Observable.defer(() => {
+            // each updated note array is stored in local storage
+            LocalStorage.save(key, todoList);
+            return Rx.Observable.return(todoList);
+          }),
+          // replace this with your preferred async service call.
+          Rx.Observable.timer(500)
+        ])
+        .map(() => todoList);
     })
+    // publish here so that multiple people can subscribe to the
+    // `todoList` Observable, but only one async network request
+    // will be go out. Replay the most recent event to future
+    // subscribers so they don't miss out on 
+    .replay(null, 1);
+    
+    // Connect publish's subject to the replay'd flatMapLatest.
+    this.todoList.connect();
   }
 }
 
