@@ -24,7 +24,9 @@
     "sort-stream": "^1.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.0.0",
-    "watchify": "^2.1.1"
+    "watchify": "^2.1.1",
+    "gulp-nodemon": "^1.0.4",
+    "gulp-notify": "^1.0.2"
   },
   "dependencies": {
     "di": "^2.0.0-pre-12",

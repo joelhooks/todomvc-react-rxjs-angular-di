@@ -19,7 +19,8 @@ var TodoList = function(TodoItem, TodoActions, EventHandler) {
 
     this.handlers = {
         toggleAllChange: toggleAllChange
-    }
+    };
+    this.props.todoList = [];
   },
 
   render: function() {
